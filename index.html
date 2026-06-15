@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Orchard Distribution Portal</title>
+  <meta name="description" content="Modern distribution center ordering and pickup workflow demo." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f7f3ec;
+      --ink: #162015;
+      --muted: #66705f;
+      --line: rgba(22, 32, 21, .12);
+      --card: rgba(255, 255, 255, .78);
+      --card-solid: #fffdf8;
+      --green: #174f32;
+      --green-2: #276244;
+      --gold: #c69a4b;
+      --amber: #f2d49b;
+      --cream: #fff8eb;
+      --shadow: 0 24px 70px rgba(22, 32, 21, .14);
+      --radius: 30px;
+      --radius-sm: 18px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100svh;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 12% 12%, rgba(242, 212, 155, .85), transparent 28rem),
+        radial-gradient(circle at 88% 8%, rgba(39, 98, 68, .22), transparent 24rem),
+        linear-gradient(135deg, #f7f3ec 0%, #efe5d4 100%);
+      overflow-x: hidden;
+    }
+
+    .grain {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .18;
+      mix-blend-mode: multiply;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 220 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.45'/%3E%3C/svg%3E");
+      z-index: 0;
+    }
+
+    .shell {
+      position: relative;
+      z-index: 1;
+      width: min(1180px, calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      padding: 18px 0;
+      backdrop-filter: blur(18px);
+      background: rgba(247, 243, 236, .74);
+      border-bottom: 1px solid rgba(22, 32, 21, .08);
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 15px;
+      background: linear-gradient(145deg, var(--green), #0f2f22);
+      box-shadow: 0 12px 28px rgba(23, 79, 50, .25);
+      display: grid;
+      place-items: center;
+      color: var(--amber);
+      font-weight: 800;
+      letter-spacing: -.06em;
+    }
+
+    .brand b { display: block; font-size: 15px; letter-spacing: -.02em; }
+    .brand span { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; white-space: nowrap; }
+
+    .navlinks {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .navlinks a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 650;
+      padding: 10px 12px;
+      border-radius: 999px;
+    }
+    .navlinks a:hover { color: var(--ink); background: rgba(255,255,255,.55); }
+
+    .btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 13px 18px;
+      font-weight: 750;
+      font-size: 14px;
+      cursor: pointer;
+      min-height: 46px;
+      color: #fff;
+      background: linear-gradient(135deg, var(--green), var(--green-2));
+      box-shadow: 0 14px 34px rgba(23, 79, 50, .26);
+      transition: transform .18s ease, box-shadow .18s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 18px 44px rgba(23,79,50,.32); }
+    .btn.secondary { color: var(--ink); background: rgba(255,255,255,.76); box-shadow: inset 0 0 0 1px var(--line); }
+    .btn.block { width: 100%; }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap: 34px;
+      align-items: center;
+      padding: clamp(42px, 7vw, 92px) 0 38px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .54);
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 750;
+      margin-bottom: 18px;
+    }
+    .dot { width: 7px; height: 7px; border-radius: 999px; background: var(--gold); box-shadow: 0 0 0 6px rgba(198,154,75,.16); }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(42px, 6.8vw, 82px);
+      line-height: .94;
+      letter-spacing: -.07em;
+      max-width: 780px;
+    }
+    .lead {
+      color: var(--muted);
+      font-size: clamp(17px, 2.2vw, 21px);
+      line-height: 1.56;
+      margin: 24px 0 30px;
+      max-width: 650px;
+    }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 30px;
+      max-width: 670px;
+    }
+    .metric {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.58);
+      border-radius: 22px;
+      padding: 18px;
+    }
+    .metric strong { display: block; font-size: 24px; letter-spacing: -.04em; color: var(--green); }
+    .metric span { display: block; margin-top: 5px; font-size: 12px; color: var(--muted); font-weight: 650; }
+
+    .phone-frame {
+      justify-self: end;
+      width: min(420px, 100%);
+      border-radius: 42px;
+      padding: 12px;
+      background: linear-gradient(145deg, rgba(255,255,255,.82), rgba(255,248,235,.64));
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255,255,255,.7);
+    }
+    .app-card {
+      border-radius: 32px;
+      overflow: hidden;
+      background: var(--card-solid);
+      border: 1px solid rgba(22,32,21,.08);
+    }
+    .app-top {
+      padding: 22px;
+      background: linear-gradient(135deg, #173f2b, #286246);
+      color: white;
+    }
+    .mini-row { display:flex; justify-content:space-between; align-items:center; gap:10px; }
+    .pill { padding: 7px 10px; border-radius: 999px; background: rgba(255,255,255,.14); font-size: 12px; font-weight: 750; }
+    .app-top h2 { margin: 28px 0 8px; font-size: 28px; line-height:1.05; letter-spacing:-.05em; }
+    .app-top p { margin:0; color: rgba(255,255,255,.78); font-size: 14px; line-height: 1.5; }
+    .order-list { padding: 18px; display:grid; gap: 12px; }
+    .order-item { padding: 15px; border-radius: 20px; background:#f7f2e8; display:grid; gap: 10px; }
+    .order-line { display:flex; justify-content:space-between; gap:12px; align-items:center; }
+    .order-line b { font-size:14px; }
+    .order-line span { color:var(--muted); font-size:12px; font-weight:700; }
+    .bar { height:8px; border-radius:999px; background:#e3d7c3; overflow:hidden; }
+    .bar i { display:block; height:100%; width:72%; border-radius:999px; background:linear-gradient(90deg,var(--gold),#dfb667); }
+
+    section { padding: 44px 0; }
+    .section-head { display:flex; justify-content:space-between; align-items:end; gap:24px; margin-bottom:20px; }
+    h3 { margin:0; font-size: clamp(28px, 4.4vw, 48px); letter-spacing:-.06em; line-height:1; }
+    .section-head p { margin:0; max-width:520px; color:var(--muted); line-height:1.55; }
+
+    .grid-3 { display:grid; grid-template-columns: repeat(3, 1fr); gap:16px; }
+    .panel {
+      background: var(--card);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,.72);
+      box-shadow: 0 18px 50px rgba(22,32,21,.08);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+    .panel h4 { margin:0 0 10px; font-size: 18px; letter-spacing:-.03em; }
+    .panel p { margin:0; color:var(--muted); line-height:1.55; font-size:14px; }
+    .num { width:38px; height:38px; border-radius:14px; display:grid; place-items:center; margin-bottom:18px; background:var(--cream); color:var(--green); font-weight:850; border:1px solid var(--line); }
+
+    .workspace {
+      display:grid;
+      grid-template-columns: .86fr 1.14fr;
+      gap: 18px;
+      align-items:start;
+    }
+
+    .form-grid { display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
+    label { display:block; font-size:12px; color:var(--muted); font-weight:800; margin-bottom:8px; }
+    input, select, textarea {
+      width:100%;
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:14px 14px;
+      background:rgba(255,255,255,.72);
+      font: inherit;
+      color:var(--ink);
+      min-height:48px;
+      outline: none;
+    }
+    input:focus, select:focus, textarea:focus { border-color:rgba(23,79,50,.45); box-shadow:0 0 0 4px rgba(23,79,50,.08); }
+    textarea { min-height: 92px; resize: vertical; }
+    .span-2 { grid-column: 1 / -1; }
+
+    .product-table { display:grid; gap:10px; }
+    .product-row {
+      display:grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      gap: 12px;
+      align-items:center;
+      padding:14px;
+      background:rgba(255,255,255,.64);
+      border:1px solid var(--line);
+      border-radius:20px;
+    }
+    .product-row b { display:block; font-size:14px; }
+    .product-row small { color:var(--muted); font-weight:650; }
+    .qty { width: 82px; text-align:center; }
+    .price { font-weight:850; color:var(--green); white-space:nowrap; }
+
+    .summary-card { background:linear-gradient(145deg, #173f2b, #2f6c4b); color:#fff; }
+    .summary-card p, .summary-card label { color: rgba(255,255,255,.72); }
+    .total-row { display:flex; justify-content:space-between; gap:18px; padding:14px 0; border-bottom:1px solid rgba(255,255,255,.15); }
+    .total-row strong { font-size:22px; letter-spacing:-.04em; }
+    .summary-card .btn { background: #fff; color: var(--green); box-shadow:none; margin-top:18px; }
+    .status-list { display:grid; gap:10px; margin-top:18px; }
+    .status { display:flex; gap:10px; align-items:flex-start; color:rgba(255,255,255,.82); font-size:13px; line-height:1.45; }
+    .check { width:18px; height:18px; border-radius:999px; background:rgba(255,255,255,.16); flex:0 0 auto; display:grid; place-items:center; font-size:11px; }
+
+    .ops {
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap:14px;
+    }
+    .ops .panel { min-height: 178px; }
+    .tag { display:inline-flex; font-size:11px; font-weight:850; color:var(--green); background:rgba(23,79,50,.08); border:1px solid rgba(23,79,50,.12); padding:6px 9px; border-radius:999px; margin-bottom:12px; }
+
+    footer { padding: 34px 0 48px; color:var(--muted); font-size:13px; }
+
+    @media (max-width: 980px) {
+      .hero, .workspace { grid-template-columns: 1fr; }
+      .phone-frame { justify-self:center; width:min(520px,100%); }
+      .grid-3, .ops { grid-template-columns: repeat(2, 1fr); }
+      .section-head { display:block; }
+      .section-head p { margin-top:12px; }
+    }
+
+    @media (max-width: 720px) {
+      .shell { width: min(100% - 28px, 1180px); }
+      header { padding: 12px 0; }
+      .navlinks a { display:none; }
+      .brand span { max-width: 180px; overflow:hidden; text-overflow:ellipsis; }
+      .hero { padding-top: 34px; gap: 28px; }
+      .lead { margin: 18px 0 24px; }
+      .hero-actions { display:grid; grid-template-columns: 1fr; }
+      .hero-actions .btn { width:100%; }
+      .metrics, .grid-3, .ops, .form-grid { grid-template-columns: 1fr; }
+      .span-2 { grid-column:auto; }
+      .metric { padding:16px; }
+      .panel { border-radius:24px; padding:20px; }
+      .product-row { grid-template-columns: 1fr; align-items:stretch; }
+      .qty { width:100%; text-align:left; }
+      .price { font-size:18px; }
+      .phone-frame { border-radius:30px; padding:8px; }
+      .app-card { border-radius:24px; }
+      section { padding: 32px 0; }
+    }
+
+    @media (max-width: 390px) {
+      h1 { font-size: 39px; }
+      .brand b { font-size: 14px; }
+      .brand span { display:none; }
+      .mark { width:38px; height:38px; border-radius:13px; }
+      .btn { padding-inline: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="grain"></div>
+  <header>
+    <div class="shell">
+      <nav>
+        <div class="brand">
+          <div class="mark">O</div>
+          <div><b>Orchard Distribution</b><span>Order deposits, fulfillment, pickup, final payment</span></div>
+        </div>
+        <div class="navlinks">
+          <a href="#workflow">Workflow</a>
+          <a href="#order">Order</a>
+          <a href="#operations">Operations</a>
+          <a class="btn" href="#order">Start demo</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section class="hero">
+      <div>
+        <div class="eyebrow"><span class="dot"></span> Distribution center demo system</div>
+        <h1>One clean ordering flow for every pickup center.</h1>
+        <p class="lead">A mobile-first portal for customers to select products, pay a deposit, receive pickup instructions, and complete final payment at one of ten distribution centers.</p>
+        <div class="hero-actions">
+          <a class="btn" href="#order">Create a sample order</a>
+          <a class="btn secondary" href="#operations">View center dashboard</a>
+        </div>
+        <div class="metrics" aria-label="System metrics">
+          <div class="metric"><strong>10</strong><span>Distribution centers</span></div>
+          <div class="metric"><strong>2-step</strong><span>Deposit + final payment</span></div>
+          <div class="metric"><strong>Mobile</strong><span>Designed for field pickup</span></div>
+        </div>
+      </div>
+
+      <div class="phone-frame" aria-label="Mobile order preview">
+        <div class="app-card">
+          <div class="app-top">
+            <div class="mini-row"><span class="pill">Order #OD-1048</span><span class="pill">Ready today</span></div>
+            <h2>Pickup scheduled for Bay Shore</h2>
+            <p>Deposit received. Customer balance is held for final payment at the counter.</p>
+          </div>
+          <div class="order-list">
+            <div class="order-item">
+              <div class="order-line"><b>Organic Produce Box</b><span>12 cases</span></div>
+              <div class="bar"><i style="width:86%"></i></div>
+            </div>
+            <div class="order-item">
+              <div class="order-line"><b>Cold Storage Bundle</b><span>4 pallets</span></div>
+              <div class="bar"><i style="width:54%"></i></div>
+            </div>
+            <div class="order-item">
+              <div class="order-line"><b>Pickup balance</b><span>$1,840 due</span></div>
+              <div class="bar"><i style="width:38%"></i></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="workflow">
+      <div class="section-head">
+        <h3>Built around the real workflow.</h3>
+        <p>Instead of a loose Google Form and a separate payment link, the system keeps the customer, the distribution center, and the back office in one controlled process.</p>
+      </div>
+      <div class="grid-3">
+        <div class="panel"><div class="num">1</div><h4>Customer order</h4><p>The customer chooses a location, products, quantities, pickup date, and contact information from a guided responsive form.</p></div>
+        <div class="panel"><div class="num">2</div><h4>Deposit payment</h4><p>The portal calculates a required deposit and sends the customer to a payment checkout with the order reference attached.</p></div>
+        <div class="panel"><div class="num">3</div><h4>Pickup completion</h4><p>Staff sees the order status, verifies inventory, collects final payment, and marks the order complete at pickup.</p></div>
+      </div>
+    </section>
+
+    <section id="order">
+      <div class="section-head">
+        <h3>Order experience.</h3>
+        <p>This is the customer-facing flow. Big inputs, clear totals, and no tiny desktop-only controls.</p>
+      </div>
+      <div class="workspace">
+        <div class="panel">
+          <div class="form-grid">
+            <div><label for="center">Distribution center</label><select id="center"><option>Bay Shore, NY</option><option>Hempstead, NY</option><option>Queens, NY</option><option>Brooklyn, NY</option><option>Bronx, NY</option></select></div>
+            <div><label for="date">Pickup date</label><input id="date" type="date" value="2026-06-18"></div>
+            <div><label for="name">Customer name</label><input id="name" value="Maria Rodriguez"></div>
+            <div><label for="phone">Phone</label><input id="phone" value="(631) 555-0198"></div>
+            <div class="span-2"><label for="notes">Pickup notes</label><textarea id="notes">Customer requested morning pickup window and loading dock access.</textarea></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="product-table">
+            <div class="product-row"><div><b>Fresh Produce Master Box</b><small>SKU FP-100 · refrigerated</small></div><input class="qty" type="number" value="12" min="0"><div class="price">$1,920</div></div>
+            <div class="product-row"><div><b>Dry Goods Pallet</b><small>SKU DG-204 · standard handling</small></div><input class="qty" type="number" value="6" min="0"><div class="price">$2,340</div></div>
+            <div class="product-row"><div><b>Cold Storage Add-on</b><small>SKU CS-031 · temperature controlled</small></div><input class="qty" type="number" value="2" min="0"><div class="price">$680</div></div>
+          </div>
+        </div>
+
+        <div class="panel summary-card">
+          <span class="pill">Payment summary</span>
+          <div style="margin-top:18px">
+            <div class="total-row"><span>Order subtotal</span><strong>$4,940</strong></div>
+            <div class="total-row"><span>Required deposit</span><strong>$1,235</strong></div>
+            <div class="total-row"><span>Due at pickup</span><strong>$3,705</strong></div>
+          </div>
+          <a class="btn block" href="#">Continue to deposit checkout</a>
+          <div class="status-list">
+            <div class="status"><span class="check">✓</span><span>Deposit link can be Stripe, Square, Clover, or bank transfer.</span></div>
+            <div class="status"><span class="check">✓</span><span>Order reference stays attached through payment and pickup.</span></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <span class="tag">Staff view</span>
+          <h4>Counter pickup checklist</h4>
+          <p>Confirm customer identity, verify order contents, collect balance, print receipt, and mark inventory deducted from the selected location.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="operations">
+      <div class="section-head">
+        <h3>Operations dashboard.</h3>
+        <p>For the full application, each center gets its own queue, inventory status, pickup schedule, and payment reconciliation.</p>
+      </div>
+      <div class="ops">
+        <div class="panel"><span class="tag">Orders</span><h4>Live pickup queue</h4><p>See pending deposits, scheduled pickups, completed orders, and delayed customers.</p></div>
+        <div class="panel"><span class="tag">Inventory</span><h4>Location stock</h4><p>Track available products by center and prevent customers from ordering unavailable items.</p></div>
+        <div class="panel"><span class="tag">Finance</span><h4>Deposit matching</h4><p>Match deposits to orders and leave a clear remaining balance for pickup staff.</p></div>
+        <div class="panel"><span class="tag">Admin</span><h4>Ten-center control</h4><p>Manage product lists, center hours, staff access, pricing, and payment settings.</p></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="shell">
+    Demo concept prepared for review. Company name and product catalog are placeholders and can be replaced once the final brand is selected.
+  </footer>
+
+  <script>
+    document.querySelectorAll('a[href="#"]').forEach(a => a.addEventListener('click', e => e.preventDefault()));
+  </script>
+</body>
+</html>
